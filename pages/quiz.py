@@ -3,19 +3,28 @@ from utils import quiz as quiz_utils
 
 st.header("Quiz")
 
+difficulty = st.session_state.get("difficulty")
+
 if "quiz" not in st.session_state:
-    q, idx = quiz_utils.ask_question()
-    st.session_state.quiz = {"q": q, "idx": idx}
+    q, idx = quiz_utils.ask_question(difficulty=difficulty)
+    st.session_state.quiz = {"q": q["question"], "opts": q["options"], "ans": q["answer"], "idx": idx, "topic": q.get("topic")}
 
 qdata = st.session_state.quiz
 st.write(qdata["q"]["question"])
 choice = st.radio("Answer", qdata["q"]["options"])
 if st.button("Submit Answer"):
-    correct = qdata["q"]["options"].index(choice) == qdata["q"]["answer"]
-    quiz_utils.record_result(correct, qdata["q"]["topic"])
+    correct = qdata["opts"].index(choice) == qdata["ans"]
+    quiz_utils.record_result(correct, qdata.get("topic"))
     st.write("Correct" if correct else "Incorrect")
-    q, idx = quiz_utils.ask_question()
-    st.session_state.quiz = {"q": q, "idx": idx}
+    q, idx = quiz_utils.ask_question(difficulty=difficulty)
+    st.session_state.quiz = {
+        "q": q["question"],
+        "opts": q["options"],
+        "ans": q["answer"],
+        "idx": idx,
+        "topic": q.get("topic"),
+    }
+
 
 score, total, *_ = quiz_utils.load_history()
 st.write(f"Score: {score}/{total}")

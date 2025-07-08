@@ -4,8 +4,10 @@ from utils import parity
 
 st.header("Put-Call Parity Practice")
 
+difficulty = st.session_state.get("difficulty", "Standard")
+
 if st.button("Generate New Parameters") or "pcp_params" not in st.session_state:
-    st.session_state.pcp_params = parity.generate_parameters()
+    st.session_state.pcp_params = parity.generate_parameters(difficulty=difficulty)
 params = st.session_state.pcp_params
 
 param_eq = (
