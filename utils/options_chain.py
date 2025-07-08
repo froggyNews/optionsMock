@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 from pandas.tseries.offsets import DateOffset
 
-from option_pricing import (
+from .option_pricing import (
     call_price,
     put_price,
     call_delta,

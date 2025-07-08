@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from option_pricing import call_price, put_price
+from .option_pricing import call_price, put_price
 
 
 def generate_parameters():
