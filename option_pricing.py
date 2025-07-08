@@ -33,7 +33,6 @@ def call_delta(S, K, r, T, sigma, q=0.0):
     """Delta of a European call."""
     return np.exp(-q * T) * norm.cdf(d1(S, K, r, T, sigma, q))
 
-
 def put_delta(S, K, r, T, sigma, q=0.0):
     """Delta of a European put."""
     return np.exp(-q * T) * (norm.cdf(d1(S, K, r, T, sigma, q)) - 1)
@@ -81,3 +80,4 @@ def put_rho(S, K, r, T, sigma, q=0.0):
     """Rho of a European put (per 1% rate change)."""
     D2 = d2(S, K, r, T, sigma, q)
     return -K * T * np.exp(-r * T) * norm.cdf(-D2) / 100
+
