@@ -10,8 +10,8 @@ if "quiz" not in st.session_state:
     st.session_state.quiz = {"q": q["question"], "opts": q["options"], "ans": q["answer"], "idx": idx, "topic": q.get("topic")}
 
 qdata = st.session_state.quiz
-st.write(qdata["q"])
-choice = st.radio("Answer", qdata["opts"])
+st.write(qdata["q"]["question"])
+choice = st.radio("Answer", qdata["q"]["options"])
 if st.button("Submit Answer"):
     correct = qdata["opts"].index(choice) == qdata["ans"]
     quiz_utils.record_result(correct, qdata.get("topic"))
@@ -25,6 +25,7 @@ if st.button("Submit Answer"):
         "topic": q.get("topic"),
     }
 
-score, total = quiz_utils.load_history()
+
+score, total, *_ = quiz_utils.load_history()
 st.write(f"Score: {score}/{total}")
 
