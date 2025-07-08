@@ -1,5 +1,5 @@
 import numpy as np
-from option_pricing import call_price, call_delta
+from .option_pricing import call_price, call_delta
 
 
 ndefault_sigma = 0.2
