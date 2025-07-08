@@ -1,5 +1,7 @@
 import streamlit as st
 import numpy as np
+import time
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -135,21 +137,3 @@ elif page == "Quiz":
         # load new question
         q, opts, ans, idx = quiz.ask_question()
         st.session_state.quiz = {"q": q, "opts": opts, "ans": ans, "idx": idx}
-
-        st.markdown("---")
-        st.subheader("About")
-        st.write("Practice options trading concepts with interactive simulations and quizzes.")
-
-    if page == "Options Chain":
-        options_chain_page()
-    elif page == "Put-Call Parity":
-        parity.put_call_parity_page()
-    elif page == "Arbitrage Simulator":
-        parity.arbitrage_simulator_page()
-    elif page == "Delta Hedging":
-        dh.delta_hedging_page()
-    elif page == "Quiz":
-        quiz.quiz_page()
-
-if __name__ == "__main__":
-    main()
