@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 
 from option_pricing import call_price
+from options_chain import generate_chain
 import parity
 import delta_hedging as dh
 import quiz
@@ -11,10 +12,39 @@ st.title("Options Practice App")
 
 page = st.sidebar.radio(
     "Select Mode",
-    ("Put-Call Parity", "Delta Hedging", "Quiz"),
+    ("Options Chain", "Put-Call Parity", "Delta Hedging", "Quiz"),
 )
 
-if page == "Put-Call Parity":
+if page == "Options Chain":
+    st.header("Options Chain Builder")
+    spot = st.number_input("Spot Price", value=100.0)
+    r = st.number_input("Risk Free Rate", value=0.01)
+    vol = st.number_input("Implied Volatility", value=0.2)
+    width = st.number_input("Strike Width", value=5.0)
+    strikes = np.arange(spot - 2 * width, spot + 2 * width + width, width)
+    expiries_months = st.multiselect(
+        "Expiry Months", options=[1, 2, 3], default=[1, 2, 3]
+    )
+    expiries = [m / 12 for m in expiries_months]
+    if expiries:
+        df_chain = generate_chain(spot, r, expiries, strikes, vol)
+        st.dataframe(df_chain)
+        if st.button("Random Prompt"):
+            row = df_chain.sample(1).iloc[0]
+            mkt_price = row["Call Price"] * (1 + np.random.uniform(-0.2, 0.2))
+            st.write(
+                f"Strike {row['Strike']}, Exp {row['Expiry']:.2f}yr, Market Price {mkt_price:.2f}"
+            )
+            choice = st.radio("Call value vs Theoretical?", ("Overpriced", "Underpriced"))
+            if st.button("Check Value"):
+                answer = "Overpriced" if mkt_price > row["Call Price"] else "Underpriced"
+                st.write("Correct" if choice == answer else f"Incorrect, was {answer}")
+            st.write(
+                f"Delta-neutral hedge: {-row['Call Delta']:.2f} shares; RevCon: {row['RevCon']:.2f}"
+            )
+
+
+elif page == "Put-Call Parity":
     st.header("Put-Call Parity Practice")
     if st.button("Generate New Parameters") or "pcp_params" not in st.session_state:
         st.session_state.pcp_params = parity.generate_parameters()
