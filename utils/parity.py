@@ -3,9 +3,13 @@ import matplotlib.pyplot as plt
 from .option_pricing import call_price, put_price
 
 
-def generate_parameters():
-    S = np.random.uniform(80, 120)
-    K = round(np.random.uniform(80, 120) * 2) / 2
+def generate_parameters(difficulty=None):
+    if difficulty == "Easy":
+        S = int(np.random.uniform(80, 120))
+        K = int(np.random.uniform(80, 120))
+    else:
+        S = np.random.uniform(80, 120)
+        K = round(np.random.uniform(80, 120) * 2) / 2
 
     r = np.random.uniform(0.0, 0.05)
     T = np.random.uniform(0.25, 1.0)  # in years
