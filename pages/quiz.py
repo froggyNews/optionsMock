@@ -7,23 +7,19 @@ difficulty = st.session_state.get("difficulty")
 
 if "quiz" not in st.session_state:
     q, idx = quiz_utils.ask_question(difficulty=difficulty)
-    st.session_state.quiz = {"q": q["question"], "opts": q["options"], "ans": q["answer"], "idx": idx, "topic": q.get("topic")}
+    # store the full question dictionary so we can reuse all fields later
+    st.session_state.quiz = {"q": q, "idx": idx}
 
 qdata = st.session_state.quiz
 st.write(qdata["q"]["question"])
 choice = st.radio("Answer", qdata["q"]["options"])
 if st.button("Submit Answer"):
-    correct = qdata["opts"].index(choice) == qdata["ans"]
-    quiz_utils.record_result(correct, qdata.get("topic"))
+    # determine correctness using the stored answer index
+    correct = qdata["q"]["options"].index(choice) == qdata["q"]["answer"]
+    quiz_utils.record_result(correct, qdata["q"].get("topic"))
     st.write("Correct" if correct else "Incorrect")
     q, idx = quiz_utils.ask_question(difficulty=difficulty)
-    st.session_state.quiz = {
-        "q": q["question"],
-        "opts": q["options"],
-        "ans": q["answer"],
-        "idx": idx,
-        "topic": q.get("topic"),
-    }
+    st.session_state.quiz = {"q": q, "idx": idx}
 
 
 score, total, *_ = quiz_utils.load_history()

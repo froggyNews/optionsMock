@@ -6,10 +6,12 @@ st.header("Options Chain Builder")
 
 difficulty = st.session_state.get("difficulty", "Standard")
 
-spot = st.number_input("Spot Price", value=100.0)
+spot_step = 1.0 if difficulty == "Easy" else 0.1
+width_step = 1.0 if difficulty == "Easy" else 0.5
+spot = st.number_input("Spot Price", value=100.0, step=spot_step)
 r = st.number_input("Risk Free Rate", value=0.01)
 vol = st.number_input("Implied Volatility", value=0.2)
-width = st.number_input("Strike Width", value=5.0)
+width = st.number_input("Strike Width", value=5.0, step=width_step)
 if difficulty == "Easy":
     spot = int(spot)
     width = int(width)
