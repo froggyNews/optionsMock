@@ -59,6 +59,11 @@ elif page == "Put-Call Parity":
     df = np.exp(-params["r"] * params["T"])
     st.latex(rf"e^{{-r T}} = {df:.3f}")
 
+    if st.checkbox("Explain Put-Call Parity"):
+        st.write(
+            "A European call minus a put with the same strike and expiry should equal the current stock price minus the present value of the strike."
+        )
+
     if "show_formula" not in st.session_state:
         st.session_state.show_formula = False
     if st.session_state.show_formula:
@@ -88,9 +93,14 @@ elif page == "Put-Call Parity":
             or (not violated and violation_user == "No")
         ) and trade_user == arb
         st.write("Correct" if correct else "Incorrect")
-        st.latex(r"C - P = S - K e^{-r T}")
-        st.latex(rf"C - P - (S - K e^{{-r T}}) = {diff:.2f}")
+        lhs = params["C"] - params["P"]
+        rhs = params["S"] - params["K"] * np.exp(-params["r"] * params["T"])
+        st.latex(
+            rf"C - P = {lhs:.2f},\; S - K e^{{-rT}} = {rhs:.2f},\; Diff = {diff:.2f}"
+        )
+        st.write(f"Recommended trade: {arb}")
         fig = parity.payoff_diagram(params, diff)
+        st.pyplot(fig)
 
 elif page == "Arbitrage Simulator":
     st.header("Mock Trade Simulation")
