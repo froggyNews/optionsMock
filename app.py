@@ -11,6 +11,7 @@ import parity
 import delta_hedging as dh
 import quiz
 import trade_simulation as ts
+import arbitrage_simulator as asim
 
 def setup_page_config():
     st.set_page_config(
@@ -63,12 +64,48 @@ def main():
     st.title("📈 Options Practice App")
     st.markdown("---")
 
-    with st.sidebar:
-        st.header("Navigation")
-        page = st.radio(
-            "Select Mode",
-            ("Options Chain", "Put-Call Parity", "Arbitrage Simulator", "Delta Hedging", "Quiz"),
-            index=0
+    if st.button("Run Simulation"):
+        trade = ts.trade_from_choices(call_choice, put_choice, stock_choice, pvk_choice)
+        st.table(asim.trade_summary_table(params, trade))
+        cf0, pnls = asim.payoff_simulation(params, trade)
+        violated, diff = parity.parity_violation(params)
+        correct_name = parity.arbitrage_strategy(diff)
+        correct_trade = ts.TRADE_MAP[correct_name]
+        matches, mismatched = asim.compare_trades(trade, correct_trade)
+        correct = matches == 4
+        st.write("Net cash flow at inception:", f"{cf0:.2f}")
+        st.write("P&L Scenarios:")
+        for price, pnl in pnls.items():
+            st.write(f"S={price}: {pnl:.2f}")
+        if correct:
+            st.success("Correct trade")
+        else:
+            st.error(f"Incorrect, expected: {correct_name}")
+            if matches >= 3:
+                hint = asim.hint_message(mismatched)
+                if hint:
+                    st.info(hint)
+        st.write("Explanation:")
+        st.latex(r"C - P \stackrel{?}{=} S - K e^{-rT}")
+        st.write(f"Difference: {diff:.2f}")
+
+elif page == "Delta Hedging":
+    st.header("Delta Hedging Simulation")
+    S0 = 100.0
+    K = 100.0
+    r = 0.01
+    T = 1.0
+    dt = 1 / 52
+
+    if "dh_state" not in st.session_state:
+        st.session_state.dh_state = dh.init_state(S0, K, r, T)
+
+    hedge_ratio = st.slider("Hedge Ratio (shares)", -2.0, 2.0, 0.0, step=0.1)
+    col1, col2 = st.columns(2)
+    if col1.button("Next Step"):
+        st.session_state.dh_state = dh.update_state(
+            st.session_state.dh_state, hedge_ratio, K, r, T, dt
+
         )
     if col2.button("Reset"):
         st.session_state.dh_state = dh.init_state(S0, K, r, T)
