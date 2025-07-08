@@ -5,7 +5,8 @@ from .option_pricing import call_price, put_price
 
 def generate_parameters():
     S = np.random.uniform(80, 120)
-    K = np.random.uniform(80, 120)
+    K = round(np.random.uniform(80, 120) * 2) / 2
+
     r = np.random.uniform(0.0, 0.05)
     T = np.random.uniform(0.25, 1.0)  # in years
     sigma = 0.2
@@ -20,7 +21,8 @@ def generate_parameters():
     else:
         P += noise
 
-    params = {"S": S, "K": K, "C": C, "P": P, "r": r, "T": T}
+    params = {"S": S, "K": K, "C": C, "P": P, "r": r, "T": T, "sigma": sigma}
+
     return params
 
 
