@@ -20,10 +20,18 @@ if page == "Put-Call Parity":
         st.session_state.pcp_params = parity.generate_parameters()
     params = st.session_state.pcp_params
 
-    st.write(
-        f"Spot (S) = {params['S']:.2f}, Strike (K) = {params['K']:.2f}, Call Price (C) = {params['C']:.2f}, "
-        f"Put Price (P) = {params['P']:.2f}, r = {params['r']:.3f}, T = {params['T']:.2f}"
+    param_eq = (
+        rf"S = {params['S']:.2f},\; K = {params['K']:.2f},\; C = {params['C']:.2f},\;"
+        rf"\; P = {params['P']:.2f},\; r = {params['r']:.3f},\; T = {params['T']:.2f}"
     )
+    st.latex(param_eq)
+
+    if 'show_formula' not in st.session_state:
+        st.session_state.show_formula = False
+    if st.button("Show Parity Formula"):
+        st.session_state.show_formula = True
+    if st.session_state.show_formula:
+        st.latex(r"C - P = S - K e^{-r T}")
 
     violation_user = st.radio("Is parity violated?", ("Yes", "No"))
     trade_user = st.radio(
