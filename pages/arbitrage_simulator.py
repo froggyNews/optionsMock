@@ -4,8 +4,10 @@ from utils import trade_simulation as ts
 
 st.header("Mock Trade Simulation")
 
+difficulty = st.session_state.get("difficulty", "Standard")
+
 if st.button("Generate Scenario") or "sim_params" not in st.session_state:
-    st.session_state.sim_params = parity.generate_parameters()
+    st.session_state.sim_params = parity.generate_parameters(difficulty=difficulty)
 params = st.session_state.sim_params
 
 eq = (
