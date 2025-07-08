@@ -1,1 +1,5 @@
-﻿streamlit
+streamlit
+numpy
+scipy
+matplotlib
+pandas
