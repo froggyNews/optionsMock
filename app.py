@@ -1,5 +1,6 @@
 import streamlit as st
 import numpy as np
+import time
 
 from option_pricing import call_price
 from options_chain import generate_chain
@@ -159,20 +160,52 @@ elif page == "Delta Hedging":
 
 elif page == "Quiz":
     st.header("Quiz")
-    if "quiz" not in st.session_state:
-        q, opts, ans, idx = quiz.ask_question()
-        st.session_state.quiz = {"q": q, "opts": opts, "ans": ans, "idx": idx}
+    difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"])
+
+    if (
+        "quiz" not in st.session_state
+        or st.session_state.quiz.get("difficulty") != difficulty
+    ):
+        q, idx = quiz.ask_question(difficulty=difficulty)
+        st.session_state.quiz = {
+            "q": q,
+            "idx": idx,
+            "start": time.time(),
+            "difficulty": difficulty,
+        }
 
     qdata = st.session_state.quiz
-    st.write(qdata["q"])
-    choice = st.radio("Answer", qdata["opts"])
+    st.write(f"Time remaining: {quiz.time_left(qdata['start'])}s")
+    st.write(qdata["q"]["question"])
+    choice = st.radio(
+        "Answer",
+        qdata["q"]["options"],
+        key=f"choice_{qdata['idx']}",
+    )
     if st.button("Submit Answer"):
-        correct = qdata["opts"].index(choice) == qdata["ans"]
-        quiz.record_result(correct)
-        st.write("Correct" if correct else "Incorrect")
+        elapsed = time.time() - qdata["start"]
+        timed_out = elapsed > quiz.TIME_LIMIT
+        selected = qdata["q"]["options"].index(choice)
+        correct = selected == qdata["q"]["answer"] and not timed_out
+        quiz.record_result(correct, qdata["q"]["topic"])
+        if timed_out:
+            st.write("Time's up!")
+        st.write("Correct!" if correct else "Incorrect.")
+        st.write("Explanation:", qdata["q"]["explanation"])
         # load new question
-        q, opts, ans, idx = quiz.ask_question()
-        st.session_state.quiz = {"q": q, "opts": opts, "ans": ans, "idx": idx}
+        q, idx = quiz.ask_question(difficulty=difficulty)
+        st.session_state.quiz = {
+            "q": q,
+            "idx": idx,
+            "start": time.time(),
+            "difficulty": difficulty,
+        }
 
-    score, total = quiz.load_history()
+    score, total, accuracy, streak, high, by_topic = quiz.load_history()
     st.write(f"Score: {score}/{total}")
+    st.write(f"Accuracy: {accuracy:.2%}")
+    st.write(f"Current Streak: {streak}")
+    st.write(f"High Score: {high}")
+    st.write("Results by Topic:")
+    for topic, stats in by_topic.items():
+        st.write(f"{topic}: {stats['sum']}/{stats['count']}")
