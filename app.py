@@ -55,11 +55,17 @@ elif page == "Put-Call Parity":
         rf"\; P = {params['P']:.2f},\; r = {params['r']:.3f},\; T = {params['T']:.2f}"
     )
     st.latex(param_eq)
+    df = np.exp(-params["r"] * params["T"])
+    st.latex(rf"e^{{-r T}} = {df:.3f}")
 
-    if 'show_formula' not in st.session_state:
+    if "show_formula" not in st.session_state:
         st.session_state.show_formula = False
-    if st.button("Show Parity Formula"):
-        st.session_state.show_formula = True
+    if st.session_state.show_formula:
+        if st.button("Hide Parity Formula"):
+            st.session_state.show_formula = False
+    else:
+        if st.button("Show Parity Formula"):
+            st.session_state.show_formula = True
     if st.session_state.show_formula:
         st.latex(r"C - P = S - K e^{-r T}")
 
@@ -82,7 +88,7 @@ elif page == "Put-Call Parity":
         ) and trade_user == arb
         st.write("Correct" if correct else "Incorrect")
         st.latex(r"C - P = S - K e^{-r T}")
-        st.write(f"Difference: {diff:.2f}")
+        st.latex(rf"C - P - (S - K e^{{-r T}}) = {diff:.2f}")
         fig = parity.payoff_diagram(params, diff)
         st.pyplot(fig)
 
