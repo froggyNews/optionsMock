@@ -4,6 +4,7 @@ An interactive Streamlit app for practicing options trading concepts. The app in
 
 - **Put-Call Parity Practice** with randomly generated parameters
 - **Delta Hedging Simulation** using a simple random walk
+- **Interactive Arbitrage Trainer** with scenario generation and Greek feedback
 - **Quiz Mode** to test knowledge of options theory
 
 ## Getting Started
@@ -14,7 +15,7 @@ An interactive Streamlit app for practicing options trading concepts. The app in
    ```
 2. Run the app:
    ```bash
-   streamlit run app.py
+   streamlit run streamlit_app.py
    ```
 
 ## Requirements
@@ -24,11 +25,11 @@ An interactive Streamlit app for practicing options trading concepts. The app in
 
 ## Project Structure
 
-- `app.py` – Streamlit application entry point
-- `option_pricing.py` – Black-Scholes utilities and Greek calculations
-- `parity.py` – Functions for put-call parity practice
-- `delta_hedging.py` – Helpers for delta hedging simulation
-- `quiz.py` – Quiz logic
-Quiz results are stored in `quiz_history.csv`.
+- `streamlit_app.py` – Main Streamlit application with links to pages
+- `pages/` – Individual app pages (parity, hedging, quiz, trading)
+- `utils/option_pricing.py` – Black-Scholes utilities and Greek calculations
+- `utils/scenario_generator.py` – Random scenario helper
+- `utils/greeks.py` – Net Greeks computation
+- `quiz_history.csv` stores quiz results
 
 This project is intended for use on Windows systems.
