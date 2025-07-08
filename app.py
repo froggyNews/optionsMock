@@ -1,5 +1,7 @@
 import streamlit as st
 import numpy as np
+import time
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -68,21 +70,66 @@ def main():
             ("Options Chain", "Put-Call Parity", "Arbitrage Simulator", "Delta Hedging", "Quiz"),
             index=0
         )
+    if col2.button("Reset"):
+        st.session_state.dh_state = dh.init_state(S0, K, r, T)
 
-        st.markdown("---")
-        st.subheader("About")
-        st.write("Practice options trading concepts with interactive simulations and quizzes.")
+    st.write(st.session_state.dh_state)
+    st.line_chart(
+        {
+            "Stock": [st.session_state.dh_state["S"]],
+            "Delta": [st.session_state.dh_state["delta"]],
+        }
+    )
 
-    if page == "Options Chain":
-        options_chain_page()
-    elif page == "Put-Call Parity":
-        parity.put_call_parity_page()
-    elif page == "Arbitrage Simulator":
-        parity.arbitrage_simulator_page()
-    elif page == "Delta Hedging":
-        dh.delta_hedging_page()
-    elif page == "Quiz":
-        quiz.quiz_page()
+elif page == "Quiz":
+    st.header("Quiz")
+    difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"])
 
-if __name__ == "__main__":
-    main()
+    if (
+        "quiz" not in st.session_state
+        or st.session_state.quiz.get("difficulty") != difficulty
+    ):
+        q, idx = quiz.ask_question(difficulty=difficulty)
+        st.session_state.quiz = {
+            "q": q,
+            "idx": idx,
+            "start": time.time(),
+            "difficulty": difficulty,
+        }
+
+    qdata = st.session_state.quiz
+    st.write(f"Time remaining: {quiz.time_left(qdata['start'])}s")
+    st.write(qdata["q"]["question"])
+    choice = st.radio(
+        "Answer",
+        qdata["q"]["options"],
+        key=f"choice_{qdata['idx']}",
+    )
+    if st.button("Submit Answer"):
+        elapsed = time.time() - qdata["start"]
+        timed_out = elapsed > quiz.TIME_LIMIT
+        selected = qdata["q"]["options"].index(choice)
+        correct = selected == qdata["q"]["answer"] and not timed_out
+        quiz.record_result(correct, qdata["q"]["topic"])
+        if timed_out:
+            st.write("Time's up!")
+        st.write("Correct!" if correct else "Incorrect.")
+        st.write("Explanation:", qdata["q"]["explanation"])
+        # load new question
+        q, idx = quiz.ask_question(difficulty=difficulty)
+        st.session_state.quiz = {
+            "q": q,
+            "idx": idx,
+            "start": time.time(),
+            "difficulty": difficulty,
+        }
+
+    score, total, accuracy, streak, high, by_topic = quiz.load_history()
+    st.write(f"Score: {score}/{total}")
+    st.write(f"Accuracy: {accuracy:.2%}")
+    st.write(f"Current Streak: {streak}")
+    st.write(f"High Score: {high}")
+    st.write("Results by Topic:")
+    for topic, stats in by_topic.items():
+        st.write(f"{topic}: {stats['sum']}/{stats['count']}")
+
