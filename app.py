@@ -30,16 +30,52 @@ if page == "Options Chain":
     if expiries:
         df_chain = generate_chain(spot, r, expiries, strikes, vol)
         st.dataframe(df_chain)
+
+        if "prompt" not in st.session_state:
+            st.session_state.prompt = None
+
         if st.button("Random Prompt"):
             row = df_chain.sample(1).iloc[0]
             mkt_price = row["Call Price"] * (1 + np.random.uniform(-0.2, 0.2))
+            st.session_state.prompt = {
+                "row": row.to_dict(),
+                "mkt_price": float(mkt_price),
+            }
+            st.session_state.pop("price_choice", None)
+            st.session_state.pop("checked", None)
+
+        prompt = st.session_state.get("prompt")
+        if prompt:
+            row = prompt["row"]
+            mkt_price = prompt["mkt_price"]
+            st.write(f"Strike {row['Strike']}, Exp {row['Expiry']:.2f}yr")
             st.write(
-                f"Strike {row['Strike']}, Exp {row['Expiry']:.2f}yr, Market Price {mkt_price:.2f}"
+                f"Theoretical Call {row['Call Price']:.2f}, Market Call {mkt_price:.2f}"
             )
-            choice = st.radio("Call value vs Theoretical?", ("Overpriced", "Underpriced"))
-            if st.button("Check Value"):
-                answer = "Overpriced" if mkt_price > row["Call Price"] else "Underpriced"
-                st.write("Correct" if choice == answer else f"Incorrect, was {answer}")
+            choice = st.radio(
+                "Is the market call overpriced or underpriced?",
+                ("Overpriced", "Underpriced"),
+                key="price_choice",
+            )
+            if st.button("Check Answer"):
+                answer = (
+                    "Overpriced" if mkt_price > row["Call Price"] else "Underpriced"
+                )
+                diff_pct = (mkt_price - row["Call Price"]) / row["Call Price"] * 100
+                st.session_state.checked = {
+                    "correct": choice == answer,
+                    "answer": answer,
+                    "diff_pct": diff_pct,
+                }
+
+            if "checked" in st.session_state:
+                result = st.session_state.checked
+                if result["correct"]:
+                    st.write("Correct")
+                else:
+                    st.write(f"Incorrect, was {result['answer']}")
+                st.write(f"Difference: {result['diff_pct']:.2f}%")
+
             st.write(
                 f"Delta-neutral hedge: {-row['Call Delta']:.2f} shares; RevCon: {row['RevCon']:.2f}"
             )
