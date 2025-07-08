@@ -7,6 +7,7 @@ import parity
 import delta_hedging as dh
 import quiz
 import trade_simulation as ts
+import arbitrage_simulator as asim
 
 
 st.title("Options Practice App")
@@ -114,20 +115,28 @@ elif page == "Arbitrage Simulator":
 
     if st.button("Run Simulation"):
         trade = ts.trade_from_choices(call_choice, put_choice, stock_choice, pvk_choice)
-        cf0, pnls = ts.simulate_trade(params, trade)
+        st.table(asim.trade_summary_table(params, trade))
+        cf0, pnls = asim.payoff_simulation(params, trade)
         violated, diff = parity.parity_violation(params)
-        correct_trade = parity.arbitrage_strategy(diff)
-        correct = trade == ts.TRADE_MAP[correct_trade]
+        correct_name = parity.arbitrage_strategy(diff)
+        correct_trade = ts.TRADE_MAP[correct_name]
+        matches, mismatched = asim.compare_trades(trade, correct_trade)
+        correct = matches == 4
         st.write("Net cash flow at inception:", f"{cf0:.2f}")
         st.write("P&L Scenarios:")
         for price, pnl in pnls.items():
             st.write(f"S={price}: {pnl:.2f}")
-        st.write("Correct" if correct else f"Incorrect, expected: {correct_trade}")
+        if correct:
+            st.success("Correct trade")
+        else:
+            st.error(f"Incorrect, expected: {correct_name}")
+            if matches >= 3:
+                hint = asim.hint_message(mismatched)
+                if hint:
+                    st.info(hint)
         st.write("Explanation:")
         st.latex(r"C - P \stackrel{?}{=} S - K e^{-rT}")
         st.write(f"Difference: {diff:.2f}")
-        st.write("User trade:", trade)
-        st.write("Required trade:", ts.TRADE_MAP[correct_trade])
 
 elif page == "Delta Hedging":
     st.header("Delta Hedging Simulation")
