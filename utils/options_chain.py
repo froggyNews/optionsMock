@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from option_pricing import (
+from .option_pricing import (
     call_price,
     put_price,
     call_delta,
