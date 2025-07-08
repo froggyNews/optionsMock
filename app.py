@@ -131,6 +131,7 @@ elif page == "Arbitrage Simulator":
 
 elif page == "Delta Hedging":
     st.header("Delta Hedging Simulation")
+
     S0 = 100.0
     K = 100.0
     r = 0.01
@@ -140,22 +141,34 @@ elif page == "Delta Hedging":
     if "dh_state" not in st.session_state:
         st.session_state.dh_state = dh.init_state(S0, K, r, T)
 
+    auto_hedge = st.checkbox("Auto-Hedge using option delta", value=True)
     hedge_ratio = st.slider("Hedge Ratio (shares)", -2.0, 2.0, 0.0, step=0.1)
+
     col1, col2 = st.columns(2)
     if col1.button("Next Step"):
         st.session_state.dh_state = dh.update_state(
-            st.session_state.dh_state, hedge_ratio, K, r, T, dt
+            st.session_state.dh_state,
+            hedge_ratio,
+            K,
+            r,
+            T,
+            dt,
+            auto_hedge=auto_hedge,
         )
     if col2.button("Reset"):
         st.session_state.dh_state = dh.init_state(S0, K, r, T)
 
-    st.write(st.session_state.dh_state)
-    st.line_chart(
+    st.write(
         {
-            "Stock": [st.session_state.dh_state["S"]],
-            "Delta": [st.session_state.dh_state["delta"]],
+            "Stock": st.session_state.dh_state["S"],
+            "Delta": st.session_state.dh_state["delta"],
+            "Hedge": st.session_state.dh_state["hedge"],
+            "PnL": st.session_state.dh_state["pnl"],
         }
     )
+
+    fig = dh.plot_history(st.session_state.dh_state)
+    st.pyplot(fig)
 
 elif page == "Quiz":
     st.header("Quiz")
