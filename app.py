@@ -1,9 +1,6 @@
 import streamlit as st
 
+st.set_page_config(page_title="Options Trainer")
 
-st.title("Options Practice App")
-st.write("Use the sidebar to navigate between pages.")
-
-difficulty = st.sidebar.selectbox("Difficulty", ["Easy", "Standard"])
-st.session_state["difficulty"] = difficulty
-
+st.title("Options Practice Suite")
+st.write("Use the button below to launch the interactive trader.")
