@@ -27,21 +27,25 @@ def pv_k(K, r, T):
     return K * np.exp(-r * T)
 
 
-def trade_from_choices(call_choice, put_choice, stock_choice, pvk_choice):
-    """Convert user selections to trade sign dictionary."""
-    choice_map = {"Buy": 1, "Sell": -1, "None": 0, "Long": 1, "Short": -1, "Borrow": 1, "Lend": -1}
+def trade_from_choices(call_choice, put_choice, stock_choice, pvk_choice, call_qty, put_qty, stock_qty):
+    """Convert user selections and quantities to trade sign dictionary."""
+    choice_map = {
+        "Buy": 1, "Sell": -1, "None": 0,
+        "Long": 1, "Short": -1,
+        "Borrow": 1, "Lend": -1
+    }
     return {
-        "call": choice_map.get(call_choice.split()[0], 0),
-        "put": choice_map.get(put_choice.split()[0], 0),
-        "stock": choice_map.get(stock_choice.split()[0], 0),
+        "call": choice_map.get(call_choice.split()[0], 0) * call_qty,
+        "put": choice_map.get(put_choice.split()[0], 0) * put_qty,
+        "stock": choice_map.get(stock_choice.split()[0], 0) * stock_qty,
         "pvk": choice_map.get(pvk_choice.split()[0], 0),
     }
 
 
-def simulate_trade(params, trade, S_future=(90, 110, 130)):
+def simulate_trade(params, trade, S_future=(90, 100, 110, 120, 130)):
     """Return initial cash flow and P&L for each future stock price."""
-    C = params["C"]
-    P = params["P"]
+    C = params.get("C", params.get("C_mkt"))
+    P = params.get("P", params.get("P_mkt"))
     S0 = params["S"]
     K = params["K"]
     r = params["r"]
@@ -66,4 +70,5 @@ def simulate_trade(params, trade, S_future=(90, 110, 130)):
             - trade["pvk"] * K
         )
         results[ST] = cf0 + end
+
     return cf0, results
