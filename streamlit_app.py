@@ -3,16 +3,14 @@ import streamlit as st
 st.set_page_config(page_title="Options Trainer")
 
 st.title("Options Practice Suite")
-st.write("Use the sidebar to select an activity.")
+st.write("Use the button below to launch the interactive trader.")
 
-pages = [
-    "parity",
-    "arbitrage_simulator",
-    "delta_hedging",
-    "options_chain",
-    "quiz",
-    "interactive_trading",
-]
+# Only expose the interactive trading page for now
+st.sidebar.page_link(
+    "pages/interactive_trading.py", label="Interactive Trading"
+)
 
-for p in pages:
-    st.sidebar.page_link(f"pages/{p}.py", label=p.replace("_", " ").title())
+# Provide a direct link from the home page
+st.page_link(
+    "pages/interactive_trading.py", label="Launch Interactive Trader", icon="▶️"
+)
