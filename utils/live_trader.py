@@ -49,7 +49,11 @@ class LiveTrader:
     def _advance_stage(self, next_stage):
         self.stage = next_stage
         st.session_state.trading_stage = next_stage
-        st.experimental_rerun()
+        # compatibility with old/new Streamlit versions
+        if hasattr(st, "experimental_rerun"):
+            st.experimental_rerun()
+        else:  # pragma: no cover - fallback for newer versions
+            st.rerun()
 
     # --- Stage Renderers ---
 
@@ -372,7 +376,10 @@ class LiveTrader:
                 "step3_complete",
             ]:
                 st.session_state.pop(key, None)
-            st.experimental_rerun()
+            if hasattr(st, "experimental_rerun"):
+                st.experimental_rerun()
+            else:  # pragma: no cover - fallback for newer versions
+                st.rerun()
 
     def _render_second_event(self):
         sc = self.scenario
@@ -480,5 +487,8 @@ class LiveTrader:
                 "step3_complete",
             ]:
                 st.session_state.pop(key, None)
-            st.experimental_rerun()
+            if hasattr(st, "experimental_rerun"):
+                st.experimental_rerun()
+            else:  # pragma: no cover - fallback for newer versions
+                st.rerun()
 
