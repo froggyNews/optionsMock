@@ -381,11 +381,11 @@ else:
         st.subheader("Initial Market Setup")
         
         # Display initial market data
-        st.info(f"""
+        st.info(fr"""
         **Initial Market Conditions:**
-        - Stock: ${sc['S']:.2f}
-        - Call Market: ${sc['C_mkt']:.2f} | Theo: ${call_theo:.2f}
-        - Put Market: ${sc['P_mkt']:.2f} | Theo: ${put_theo:.2f}
+        - Stock: \${sc['S']:.2f}
+        - Call Market: \${sc['C_mkt']:.2f} | Theo: \${call_theo:.2f}
+        - Put Market: \${sc['P_mkt']:.2f} | Theo: \${put_theo:.2f}
         - Time to expiry: {sc['T']:.2f} years
         - Volatility: {sc['sigma']:.1%}
         """)
