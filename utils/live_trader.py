@@ -49,21 +49,30 @@ class LiveTrader:
     def _advance_stage(self, next_stage):
         self.stage = next_stage
         st.session_state.trading_stage = next_stage
-        st.experimental_rerun()
+        # compatibility with old/new Streamlit versions
+        if hasattr(st, "experimental_rerun"):
+            st.experimental_rerun()
+        else:  # pragma: no cover - fallback for newer versions
+            st.rerun()
+
 
     # --- Stage Renderers ---
 
     def _render_initial(self):
         sc = self.scenario
         st.subheader("Initial Market Setup")
-        st.info(fr"""
+        st.info(
+            f"""
         **Initial Market Conditions:**
-        - Stock: ${sc['S']:.2f}$
-        - Call Market: ${sc['C_mkt']:.2f}$ | Theo: ${self.call_theo:.2f}$
-        - Put Market: ${sc['P_mkt']:.2f}$ | Theo: ${self.put_theo:.2f}$
+        - Stock: ${sc['S']:.2f}
+        - Call Market: ${sc['C_mkt']:.2f} | Theo: ${self.call_theo:.2f}
+        - Put Market: ${sc['P_mkt']:.2f} | Theo: ${self.put_theo:.2f}
         - Time to expiry: {sc['T']:.2f} years
         - Volatility: {sc['sigma']:.1%}
-        """)
+        """
+        )
+
+
         with st.form("initial_assessment"):
             st.markdown("### Quick Market Assessment")
 
@@ -369,7 +378,11 @@ class LiveTrader:
                 "step3_complete",
             ]:
                 st.session_state.pop(key, None)
-            st.experimental_rerun()
+            if hasattr(st, "experimental_rerun"):
+                st.experimental_rerun()
+            else:  # pragma: no cover - fallback for newer versions
+                st.rerun()
+
 
     def _render_second_event(self):
         sc = self.scenario
@@ -477,5 +490,8 @@ class LiveTrader:
                 "step3_complete",
             ]:
                 st.session_state.pop(key, None)
-            st.experimental_rerun()
+            if hasattr(st, "experimental_rerun"):
+                st.experimental_rerun()
+            else:  # pragma: no cover - fallback for newer versions
+                st.rerun()
 
