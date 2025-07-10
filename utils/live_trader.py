@@ -56,17 +56,14 @@ class LiveTrader:
     def _render_initial(self):
         sc = self.scenario
         st.subheader("Initial Market Setup")
-        st.info(
-            f"""
+        st.info(fr"""
         **Initial Market Conditions:**
-        - Stock: ${sc['S']:.2f}
-        - Call Market: ${sc['C_mkt']:.2f} | Theo: ${self.call_theo:.2f}
-        - Put Market: ${sc['P_mkt']:.2f} | Theo: ${self.put_theo:.2f}
+        - Stock: ${sc['S']:.2f}$
+        - Call Market: ${sc['C_mkt']:.2f}$ | Theo: ${self.call_theo:.2f}$
+        - Put Market: ${sc['P_mkt']:.2f}$ | Theo: ${self.put_theo:.2f}$
         - Time to expiry: {sc['T']:.2f} years
         - Volatility: {sc['sigma']:.1%}
-        """
-        )
-
+        """)
         with st.form("initial_assessment"):
             st.markdown("### Quick Market Assessment")
 
