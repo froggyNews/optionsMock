@@ -780,72 +780,17 @@ else:
         st.markdown(f"### **Total Position P&L: ${cumulative_pnl:+,.0f}** ({total_pnl_status})")
         
         # Final assessment form
-        with st.form("final_assessment_form"):
-            st.markdown("### Final Trading Assessment")
-            
-            # Overall performance
-            overall_performance = st.selectbox(
-                "1. How would you rate your overall trading performance?",
-                ["Excellent - made good decisions", "Good - mostly right", "Mixed - some mistakes", "Poor - need improvement"]
-            )
-            
-            # Key lesson
-            key_lesson = st.selectbox(
-                "2. What's the most important lesson from this sequence?",
-                ["Delta hedging is crucial", "Volatility changes matter most", "Time decay is powerful", "Multiple events compound risk", "Position sizing matters"]
-            )
-            
-            # What would you do differently
-            different_approach = st.text_area(
-                "3. What would you do differently next time?",
-                placeholder="Describe your key takeaways and improvements..."
-            )
-            
-            if st.form_submit_button("Complete Assessment"):
-                # Store final assessment
-                st.session_state.final_assessment = {
-                    'performance': overall_performance,
-                    'lesson': key_lesson,
-                    'improvements': different_approach,
-                    'total_pnl': cumulative_pnl,
-                    'events_handled': 2
-                }
-                
-                # Show final feedback
-                st.markdown("### Final Results")
-                
-                if cumulative_pnl > 500:
-                    st.success(f"**Profitable Trading!** Total P&L: ${cumulative_pnl:+,.0f}")
-                elif cumulative_pnl > -500:
-                    st.info(f"**Break-Even Trading** Total P&L: ${cumulative_pnl:+,.0f}")
-                else:
-                    st.warning(f"**Learning Experience** Total P&L: ${cumulative_pnl:+,.0f}")
-                
-                # Trading insights based on performance
-                if "Excellent" in overall_performance and cumulative_pnl > 1000:
-                    st.success("""
-                    **Market Maker Level Performance!**
-                    You demonstrated strong risk assessment, proper position sizing, and adaptive decision-making.
-                    """)
-                elif cumulative_pnl > 0:
-                    st.info("""
-                    **Solid Trading Performance**
-                    You managed risk well and adapted to changing market conditions.
-                    """)
-                else:
-                    st.info("""
-                    **Valuable Learning Experience**
-                    Every loss teaches important lessons about risk management and market dynamics.
-                    """)
-                
-                # Specific feedback based on key lesson
-                if key_lesson == "Delta hedging is crucial":
-                    st.info("**Great insight!** Delta hedging is fundamental to managing directional risk in options trading.")
-                elif key_lesson == "Volatility changes matter most":
-                    st.info("**Excellent observation!** Vega risk can dominate P&L, especially for straddles and strangles.")
-                elif key_lesson == "Multiple events compound risk":
-                    st.info("**Advanced understanding!** Sequential market events test your ability to adapt continuously.")
         
+                # Show final feedback
+        st.markdown("### Final Results")
+        
+        if cumulative_pnl > 500:
+            st.success(f"**Profitable Trading!** Total P&L: ${cumulative_pnl:+,.0f}")
+        elif cumulative_pnl > -500:
+            st.info(f"**Break-Even Trading** Total P&L: ${cumulative_pnl:+,.0f}")
+        else:
+            st.warning(f"**Learning Experience** Total P&L: ${cumulative_pnl:+,.0f}")
+ 
         # Option to start over
         if st.button("Start New Scenario", key="start_over_final"):
             for key in ['trading_stage', 'initial_position', 'market_events', 'event_response', 'final_assessment', 'step1_complete', 'step2_complete', 'step3_complete']:
