@@ -1,13 +1,17 @@
 import streamlit as st
 
 
+
+
 def difficulty_selector() -> str:
     """Sidebar widget to choose difficulty level."""
     st.session_state.setdefault("difficulty", "Easy")
     diff = st.sidebar.selectbox(
         "Difficulty", ["Easy", "Normal", "Hard"], key="difficulty"
+
     )
     return diff
+
 
 
 def taker_trade_form():

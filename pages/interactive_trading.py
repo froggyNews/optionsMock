@@ -17,7 +17,6 @@ st.set_page_config(
 
 # Header
 st.title("Options Trading Simulator")
-st.caption("Personal Training Tool for Options Market Making Skills")
 
 # Scenario Generation
 if st.button("Generate New Scenario", key="generate_new_scenario") or "scenario" not in st.session_state:
