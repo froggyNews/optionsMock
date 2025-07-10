@@ -69,6 +69,7 @@ if step1_submit:
     base_call = sc["C_mkt"] + 0.5 * call_edge
     base_put = sc["P_mkt"] + 0.5 * put_edge
     target = sc["S"] - sc["K"] * discount_factor
+
     diff = base_call - base_put
     adjust = diff - target
     correct_call = base_call - adjust / 2

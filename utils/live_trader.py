@@ -283,7 +283,6 @@ class LiveTrader:
                 self._advance_stage("feedback")
 
     def _render_feedback(self):
-        st.subheader("Response Analysis")
         response = st.session_state.event_response
 
         st.markdown("### Scorecard")
