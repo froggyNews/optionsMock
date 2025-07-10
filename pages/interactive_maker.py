@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import streamlit as st
 
 from utils import greeks, option_pricing as op, scenario_generator
@@ -28,7 +29,30 @@ combined_delta = call_delta + put_delta
 df = np.exp(-sc["r"] * sc["T"])
 
 st.markdown("### Market Scenario")
-st.write(sc)
+
+env_data = {
+    "Spot (S)": f"${sc['S']:.2f}",
+    "Strike (K)": f"${sc['K']:.2f}",
+    "Rate (r)": f"{sc['r']:.2%}",
+    "Time to Expiration (T)": f"{sc['T']:.2f} yrs",
+    "Volatility (σ)": f"{sc['sigma']:.2%}",
+    "e^{-rT}": f"{df:.4f}",
+}
+
+st.markdown("### Market Environment")
+for label, val in env_data.items():
+    if label == "e^{-rT}":
+        st.latex(rf"{label} = {val}")
+    else:
+        st.markdown(f"**{label}:** {val}")
+
+option_data = {
+    "Metric": ["Market Price", "Theoretical Price", "Delta"],
+    "Call": [f"${sc['C_mkt']:.2f}", f"${call_theo:.2f}", f"{call_delta:.2f}"],
+    "Put": [f"${sc['P_mkt']:.2f}", f"${put_theo:.2f}", "—"],
+}
+option_df = pd.DataFrame(option_data)
+st.table(option_df)
 
 st.markdown("### Step 1: Parity & Mispricing")
 with st.form("maker_step1"):
