@@ -23,6 +23,7 @@ class MarketMaker(LiveTrader):
         elif side.lower() == "sell":
             self.inventory += qty
         st.session_state.maker_inventory = self.inventory
-        pnl = (price - self.quote[side.lower() == "buy" and "ask" or "bid"]) * qty
+        quote_price = self.quote["ask"] if side.lower() == "buy" else self.quote["bid"]
+        pnl = (price - quote_price) * qty
         st.session_state.setdefault("maker_pnl", 0)
         st.session_state["maker_pnl"] += pnl

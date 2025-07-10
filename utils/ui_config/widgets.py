@@ -3,8 +3,10 @@ import streamlit as st
 
 def difficulty_selector() -> str:
     """Sidebar widget to choose difficulty level."""
-    diff = st.sidebar.selectbox("Difficulty", ["Easy", "Normal", "Hard"], key="difficulty")
-    st.session_state["difficulty"] = diff
+    st.session_state.setdefault("difficulty", "Easy")
+    diff = st.sidebar.selectbox(
+        "Difficulty", ["Easy", "Normal", "Hard"], key="difficulty"
+    )
     return diff
 
 
