@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import streamlit as st
 
 from utils import greeks, option_pricing as op, scenario_generator
@@ -11,10 +12,15 @@ st.title("Market Maker Practice")
 
 difficulty_selector()
 
-if "scenario" not in st.session_state:
-    st.session_state["scenario"] = scenario_generator.generate_scenario()
+if (
+    st.button("Generate New Scenario", key="maker_new")
+    or "scenario" not in st.session_state
+):
+    st.session_state.scenario = scenario_generator.generate_scenario()
+    for key in ["maker_step1", "maker_step2", "maker_step3", "maker_step4"]:
+        st.session_state.pop(key, None)
 
-sc = st.session_state["scenario"]
+sc = st.session_state.scenario
 
 call_delta = greeks.call_delta(sc["S"], sc["K"], sc["r"], sc["T"], sc["sigma"])
 put_delta = greeks.put_delta(sc["S"], sc["K"], sc["r"], sc["T"], sc["sigma"])
@@ -25,10 +31,33 @@ call_edge = call_theo - sc["C_mkt"]
 put_edge = put_theo - sc["P_mkt"]
 combined_delta = call_delta + put_delta
 
-df = np.exp(-sc["r"] * sc["T"])
+discount_factor = np.exp(-sc["r"] * sc["T"])
 
-st.markdown("### Market Scenario")
-st.write(sc)
+st.subheader("Market Scenario")
+
+env_data = {
+    "Spot (S)": f"${sc['S']:.2f}",
+    "Strike (K)": f"${sc['K']:.2f}",
+    "Rate (r)": f"{sc['r']:.2%}",
+    "Time to Expiration (T)": f"{sc['T']:.2f} yrs",
+    "Volatility (σ)": f"{sc['sigma']:.2%}",
+    "e^{-rT}": f"{discount_factor:.4f}",
+}
+
+st.markdown("### Market Environment")
+for label, val in env_data.items():
+    if label == "e^{-rT}":
+        st.latex(rf"{label} = {val}")
+    else:
+        st.markdown(f"**{label}:** {val}")
+
+option_data = {
+    "Metric": ["Market Price", "Theoretical Price", "Delta"],
+    "Call": [f"${sc['C_mkt']:.2f}", f"${call_theo:.2f}", f"{call_delta:.2f}"],
+    "Put": [f"${sc['P_mkt']:.2f}", f"${put_theo:.2f}", "—"],
+}
+option_df = pd.DataFrame(option_data)
+st.table(option_df)
 
 st.markdown("### Step 1: Parity & Mispricing")
 with st.form("maker_step1"):
@@ -39,7 +68,8 @@ with st.form("maker_step1"):
 if step1_submit:
     base_call = sc["C_mkt"] + 0.5 * call_edge
     base_put = sc["P_mkt"] + 0.5 * put_edge
-    target = sc["S"] - sc["K"] * df
+    target = sc["S"] - sc["K"] * discount_factor
+
     diff = base_call - base_put
     adjust = diff - target
     correct_call = base_call - adjust / 2
