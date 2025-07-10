@@ -55,6 +55,7 @@ class LiveTrader:
         else:  # pragma: no cover - fallback for newer versions
             st.rerun()
 
+
     # --- Stage Renderers ---
 
     def _render_initial(self):
@@ -70,6 +71,7 @@ class LiveTrader:
         - Volatility: {sc['sigma']:.1%}
         """
         )
+
 
         with st.form("initial_assessment"):
             st.markdown("### Quick Market Assessment")
@@ -380,6 +382,7 @@ class LiveTrader:
                 st.experimental_rerun()
             else:  # pragma: no cover - fallback for newer versions
                 st.rerun()
+
 
     def _render_second_event(self):
         sc = self.scenario
